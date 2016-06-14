@@ -1,2 +1,2 @@
 # node-data-migrator
-Node.js module for migrating data between two different data objects using simple paths, conditions, and hooks
+Node.js module for migrating data between two different data objects using paths, normalize, conditions, and hooks
