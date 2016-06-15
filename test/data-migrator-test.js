@@ -136,15 +136,33 @@ describe('Working with DataMigrator', function(done) {
       dataMigrator.addPath({from:'sourceObject1.key5'});
       dataMigrator.addPath({from:'sourceObject1.key6'});
       dataMigrator.run({}, (err, results)=>{
+        dataMigrator.clearPaths();
         done();
       });
     });
     it('should return detailed stats on the results of the function');
     it('should work with custom from functions');
     it('should work with custom to functions');
-    it('should work with custom condition functions');
+    it('should work with custom condition functions', function(done){
+      dataMigrator.addPath(
+        {
+          from:'sourceObject1.key1',
+          fromCondition: 'isBoolean',
+        }
+      );
+      dataMigrator.addPath(
+        {
+          from:'sourceObject1.key2',
+          fromCondition: (value) => { return _.isBoolean(value); },
+        }
+      );
+      dataMigrator.run({}, (err, stats)=>{
+        expect(stats).to.have.property('totalPathsProcessed', 2);
+        dataMigrator.clearPaths();
+        done();
+      });
+    });
     it('should work with custom normalize functions', function(done){
-      dataMigrator.clearPaths();
       dataMigrator.addNormalize({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
       dataMigrator.addPath(
         {
@@ -154,6 +172,7 @@ describe('Working with DataMigrator', function(done) {
       );
       dataMigrator.run({}, (err, stats)=>{
         expect(stats).to.have.property('totalPathsProcessed', 1);
+        dataMigrator.clearPaths();
         dataMigrator.removeNormalize({key:'sqValue'});
         done();
       });
