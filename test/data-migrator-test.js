@@ -143,7 +143,21 @@ describe('Working with DataMigrator', function(done) {
     it('should work with custom from functions');
     it('should work with custom to functions');
     it('should work with custom condition functions');
-    it('should work with custom noramlize functions');
+    it('should work with custom normalize functions', function(done){
+      dataMigrator.clearPaths();
+      dataMigrator.addNormalize({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
+      dataMigrator.addPath(
+        {
+          from:'sourceObject1.key4',
+          normalize: 'sqValue',
+        }
+      );
+      dataMigrator.run({}, (err, stats)=>{
+        expect(stats).to.have.property('totalPathsProcessed', 1);
+        dataMigrator.removeNormalize({key:'sqValue'});
+        done();
+      });
+    });
   });
   describe('addPaths()', function() {
     it('should support adding in an array of path objects');
