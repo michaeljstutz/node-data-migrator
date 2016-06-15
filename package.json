@@ -1,7 +1,7 @@
 {
-  "name": "node-data-migrator",
+  "name": "data-migrator",
   "version": "0.1.0",
-  "description": "Node.js module for migrating data between two different data objects using simple paths, conditions, and hooks",
+  "description": "Node.js module for migrating data between two different data objects using paths, conditions, and normalize functions",
   "main": "lib/data-migrator.js",
   "scripts": {
     "test": "mocha --reporterspec --bail --check-leaks test/"
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/michaeljstutz/node-data-migrator.git"
   },
   "author": "Michael Stutz <michaeljstutz@gmail.com>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/michaeljstutz/node-data-migrator/issues"
   },
