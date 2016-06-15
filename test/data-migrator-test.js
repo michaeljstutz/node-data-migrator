@@ -141,6 +141,7 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should return detailed stats on the results of the function');
+    it('should work with appending items from one array into another');
     it('should work with custom from functions');
     it('should work with custom to functions');
     it('should work with custom condition functions', function(done){
