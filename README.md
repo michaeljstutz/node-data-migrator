@@ -9,38 +9,31 @@ npm install --save data-migrator
 In Node.js
 ```
 var DataMigrator = require('data-migrator');
-var dataMigrator = new DataMigrator();
 
 ```
 ## Quick Examples
 
 ```js
-
 var sourceObject = {
   item1: 1,
   item2: '2',
-  item3: true,
-  item4: [1,2,3,4],
-  item5: {subItem1: 1, subItem2: '2'},
+  item3: [3],
+  item4: 4,
 };
 
 var targetObject = {
-  newItem1: [],
-  newItem2: {},
+  newItem1: 0,
+  newItem2: 0,
+  newItem3: 0,
+  newItem4: 4,
 };
 
-dataMigrator.addSource(sourceObject);
-dataMigrator.addTarget(targetObject);
+var dataMigrator = new DataMigrator({source:sourceObject, target:targetObject});
 
-dataMigrator.addPath({from:'item1', to:'newItem2.item1', normalize: function(value){ return value * 10; }});
-dataMigrator.addPath({from:'item2', to:'newItem2.item2', normalize:'number'});
-dataMigrator.addPath({from:'item3', to:'newItem2.item3', fromCondition:'isNumber'});
-dataMigrator.addPath({from:'item4[1]', to:'newItem1[]'}, fromCondition:'isNumber', toCondition:'isArray');
-dataMigrator.addPath({from:'item4[3]', to:'newItem1[]'}, fromCondition:'isNumber', toCondition:'isArray');
-dataMigrator.addPath({from:'item4[0]', to:'newItem1[]'}, fromCondition:'isNumber', toCondition:'isArray');
-dataMigrator.addPath({from:'item4[2]', to:'newItem1[]'}, fromCondition:'isNumber', toCondition:'isArray');
-dataMigrator.addPath({from:'item5.subItem1', to:'newItem2.item5.subItem1', normalize:'string'});
-dataMigrator.addPath({from:'item5.subItem2', to:'newItem2.item5.subItem2', normalize:'string'});
+dataMigrator.addPath({from:'item1', to:'newItem1', normalizer: function(value){ return value; }});
+dataMigrator.addPath({from:'item2', to:'newItem2', normalizer:'number'});
+dataMigrator.addPath({from:'item3[0]', to:'newItem3', fromCondition:'isNumber'});
+dataMigrator.addPath({from:'item4', to:'newItem4', toCondition:'isEmpty'});
 
 dataMigrator.run(function(err, stats){
   console.log('dataMigrator.run() has completed with the below stats...');
@@ -51,46 +44,17 @@ dataMigrator.run(function(err, stats){
 ###The code should display the following on the console
 ```js
 dataMigrator.run() has completed with the below stats...
-stats: {
-  "totalPathsProcessed": 9,
+{
   "sourceUriNotFound": 0,
-  "fromConditionFailed": 1,
-  "toConditionFailed": 0
+  "fromConditionFailed": 0,
+  "toConditionFailed": 0,
+  "totalToPathsProcessed": 4,
+  "totalFromPathsProcessed": 4
 }
-sourceObject: {
-  "item1": 1,
-  "item2": "2",
-  "item3": true,
-  "item4": [
-    1,
-    2,
-    3,
-    4
-  ],
-  "item5": {
-    "subItem1": 1,
-    "subItem2": "2"
-  }
+{
+  "newItem1": 1,
+  "newItem2": 2,
+  "newItem3": 3,
+  "newItem4": 4
 }
-targetObject: {
-  "newItem1": [
-    2,
-    4,
-    1,
-    3
-  ],
-  "newItem2": {
-    "item1": 10,
-    "item2": 2,
-    "item5": {
-      "subItem1": "1",
-      "subItem2": "2"
-    }
-  }
-}
-
-
 ```
-
-Note: the fromConditionFailed: 1 count value is because the condition isNumber failed for item3 (was a boolean)
-

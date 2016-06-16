@@ -16,29 +16,32 @@ describe('Working with DataMigrator', function(done) {
       key3: 1,
       key4: '2',
       key5: [1,2,3,4,5],
-      key6: {},
-    },
-    sourceObject2: {
-      sourceArray: [
-        1,
-        '2',
-        {
-          type: 'test',
-          value: 'true',
-        },
-        [
-          '1',
-          '2',
-          '3',
-        ],
-      ],
+      key6: {one:1, two:'2', three: 3, four: 4, five: '5'},
     },
   };
-  let testTarget = {testing:true};
+  let testTarget = {testing:true,sourceObject1:{key1: false }};
   let dataMigrator = new DataMigrator();
-  describe('Base functionality', function(done) {
-    it('should be created using the new keyword to create an instance');
-    it('should support passing in starting params');
+  describe('Base functionality', function() {
+    it('should be created using the new keyword to create an instance', function(done){
+      expect(DataMigrator).to.throw('Object must be created using the new keyword');
+      expect(new DataMigrator()).to.be.an('object');
+      let test2 = new DataMigrator();
+      done();  
+    });
+    it('should support passing in starting params', function(){
+      let testMigrator = new DataMigrator({
+        source: testSource,
+        target: testTarget,
+        conditions: [{key:'testing', function:(value)=>{return true;}}],
+        normalizers: [{key:'testing', function:(value)=>{return value;}}],
+        paths: [{from:'sourceObject1'}],
+      });
+      expect(testMigrator._source).to.deep.equal(testSource);
+      expect(testMigrator._target).to.deep.equal(testTarget);
+      expect(Object.keys(testMigrator._conditions).length).to.be.a('number', 1);
+      expect(Object.keys(testMigrator._normalizers).length).to.be.a('number', 1);
+      expect(Object.keys(testMigrator._paths).length).to.be.a('number', 1);
+    });
   });
   describe('setSource() & getSource()', function() {
     it('should throw an error when passed a bad object', function(){
@@ -64,22 +67,46 @@ describe('Working with DataMigrator', function(done) {
         .to.have.property('testing', testTarget.testing);
     });
   });
+  describe('reset()', function() {
+    it('should be able to reset everything', function(){
+      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
+    });
+  });
   describe('addPath()', function() {
     let testParams = {};
-    it('should throw an error when parms.from is missing', function(){
-      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params.from is required');
+    it('should throw an error if not passed an object or array', function(){
+      expect(dataMigrator.addPath.bind(dataMigrator, 'invalid')).to.throw('params is not an array or an object');
     });
-    it('should return the added pathId', function(){
+    it('should throw an error when parms.from is missing', function(){
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].from is required');
+    });
+    it('should throw an error when parms.from is empty', function(){
       testParams.from = '';
-      expect(dataMigrator.addPath.bind(dataMigrator, testParams)()).that.is.a('string');
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].from can not be empty');
+    });
+    it('should support adding in an array of path objects', function(){
+      expect(dataMigrator.addPath.bind(dataMigrator, [
+        {from:'sourceObject1.key1'},
+        {from:'sourceObject1.key2'},
+      ])).to.not.throw();
+    });
+    it('should throw an error with details on which path caused the problem (when passing an array)', function(){
+      expect(dataMigrator.addPath.bind(dataMigrator, [
+        {from:'sourceObject1.key1'},
+        {from:''},
+      ])).to.throw('params[1].from can not be empty');
+    });
+    it('should return the total added count', function(){
+      testParams.from = 'sourceObject1.key1';
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)()).that.is.an('array').and.not.be.empty;
     });
     it('should throw an error when parms.fromCondition is not valid', function(){
       testParams.fromCondition = {};
-      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params.fromCondition is not a function or string');
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].fromCondition is not a function or string');
     });
     it('should throw an error when parms.fromCondition is not valid', function(){
       testParams.fromCondition = 'invalid';
-      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params.fromCondition function from string can not be found');
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].fromCondition function can not be found');
     });
     it('should not throw an error with a valid parms.fromCondition string', function(){
       testParams.fromCondition = 'notNull';
@@ -87,41 +114,108 @@ describe('Working with DataMigrator', function(done) {
     });
     it('should throw an error when parms.toCondition is not valid', function(){
       testParams.toCondition = {};
-      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params.toCondition is not a function or string');
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].toCondition is not a function or string');
     });
     it('should throw an error when parms.toCondition is not valid', function(){
       testParams.toCondition = 'invalid';
-      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params.toCondition function from string can not be found');
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].toCondition function can not be found');
     });
     it('should not throw an error with a valid parms.toCondition string', function(){
       testParams.toCondition = 'notNull';
       expect(dataMigrator.addPath.bind(dataMigrator, testParams)).not.to.throw();
     });
-    it('should support from being a function');
-    it('should support to being a function');
+    it('should support params.toConditionTest allowing the condition test to match true or false', function(){
+      expect(dataMigrator.addPath.bind(dataMigrator, [
+        {from:'sourceObject1.key1', toCondition: 'false', toConditionTest: false}
+      ])).to.not.throw();
+    });
+    it('should support params.normalizerArgs to be passed to the normalizer function', function(){
+      expect(dataMigrator.addPath.bind(dataMigrator, [
+        {from:'sourceObject1.key1', normalizer: 'string', normalizerArgs: {test:true}}
+      ])).to.not.throw();
+    });
   });
   describe('removePath()', function() {
-    it('should remove path given the id passed in');
+    it('should remove path given the id passed in', function(){
+      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
+      let samplePath = {from:'sourceObject1.key1', normalizer: 'string'};
+      let sampleIds = dataMigrator.addPath.bind(dataMigrator, samplePath)();
+      expect(dataMigrator.getPath.bind(dataMigrator, sampleIds[0])()).to.not.be.false;
+      expect(dataMigrator.removePath.bind(dataMigrator, {id:sampleIds[0]})).to.not.throw();
+      expect(dataMigrator.getPath.bind(dataMigrator, sampleIds[0])()).to.be.false;
+    });
   });
   describe('addCondition()', function() {
-    it('should be able to add a new conditon function');
+    it('should be able to add a new conditon function', function(){
+      expect(dataMigrator.addCondition.bind(dataMigrator, [
+        {key:'test1', function: (value)=>{return true;}}
+      ])).to.not.throw();
+    });
+    it('should throw an error if function is not a function', function(){
+      expect(dataMigrator.addCondition.bind(dataMigrator, [
+        {key:'test2', function: 'false'}
+      ])).to.throw('params[0].function must be a function');
+    });
   });
   describe('removeCondition()', function() {
-    it('should be able to remove condition function by key');
+    it('should be able to remove condition function by key', function(){
+      expect(dataMigrator.addCondition.bind(dataMigrator, [
+        {key:'test1', function: (value)=>{return true;}}
+      ])).to.not.throw();
+      expect(dataMigrator.removeCondition.bind(dataMigrator, [
+        {key:'test1'}
+      ])).to.not.throw();
+    });
   });
-  describe('addNormalize()', function() {
-    it('should be able to add a new normalize function');
+  describe('addNormalizer()', function() {
+    it('should be able to add a new normalizer function', function(){
+      expect(dataMigrator.addNormalizer.bind(dataMigrator, [
+        {key:'test1', function: (value)=>{return value;}}
+      ])).to.not.throw();
+    });
+    it('should throw an error if function is not a function', function(){
+      expect(dataMigrator.addNormalizer.bind(dataMigrator, [
+        {key:'test2', function: 'false'}
+      ])).to.throw('params[0].function must be a function');
+    });
   });
-  describe('removeNormalize()', function() {
-    it('should be able to remove the normalize function by key');
+  describe('removeNormalizer()', function() {
+    it('should be able to remove the normalizer function by key', function(){
+      expect(dataMigrator.addNormalizer.bind(dataMigrator, [
+        {key:'test1', function: (value)=>{return value;}}
+      ])).to.not.throw();
+      expect(dataMigrator.removeNormalizer.bind(dataMigrator, [
+        {key:'test1'}
+      ])).to.not.throw();
+    });
   });
   describe('clearPaths()', function() {
     it('should clear all the current paths', function(){
       expect(dataMigrator.clearPaths.bind(dataMigrator)()).that.is.a('boolean', true);
     });
   });
+  describe('reset()', function() {
+    it('should be able reset all the internal values', function(){
+      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
+    });
+  });
   describe('run()', function() {
-    it('should supporting passing in most of the params');
+    it('should supporting passing in most of the params', function(){
+      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
+      expect(dataMigrator.run.bind(dataMigrator, {
+        source: testSource,
+        target: testTarget,
+        conditions: [{key:'testing', function:(value)=>{return true;}}],
+        normalizers: [{key:'testing', function:(value)=>{return value;}}],
+        paths: [{from:'sourceObject1'}],      
+      })).not.to.throw();
+      expect(dataMigrator._source).to.deep.equal(testSource);
+      expect(dataMigrator._target).to.deep.equal(testTarget);
+      expect(Object.keys(dataMigrator._conditions).length).to.be.a('number', 1);
+      expect(Object.keys(dataMigrator._normalizers).length).to.be.a('number', 1);
+      expect(Object.keys(dataMigrator._paths).length).to.be.a('number', 1);
+      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
+    });
     it('should process all the paths added', function(done){
       dataMigrator.addPath(
         {
@@ -140,10 +234,6 @@ describe('Working with DataMigrator', function(done) {
         done();
       });
     });
-    it('should return detailed stats on the results of the function');
-    it('should work with appending items from one array into another');
-    it('should work with custom from functions');
-    it('should work with custom to functions');
     it('should work with custom condition functions', function(done){
       dataMigrator.addPath(
         {
@@ -158,29 +248,28 @@ describe('Working with DataMigrator', function(done) {
         }
       );
       dataMigrator.run({}, (err, stats)=>{
-        expect(stats).to.have.property('totalPathsProcessed', 2);
+        expect(stats).to.have.property('totalFromPathsProcessed', 2);
         dataMigrator.clearPaths();
         done();
       });
     });
-    it('should work with custom normalize functions', function(done){
-      dataMigrator.addNormalize({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
+    it('should work with custom normalizer functions', function(done){
+      dataMigrator.addNormalizer({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
       dataMigrator.addPath(
         {
           from:'sourceObject1.key4',
-          normalize: 'sqValue',
+          normalizer: 'sqValue',
         }
       );
       dataMigrator.run({}, (err, stats)=>{
-        expect(stats).to.have.property('totalPathsProcessed', 1);
+        expect(stats).to.have.property('totalFromPathsProcessed', 1);
         dataMigrator.clearPaths();
-        dataMigrator.removeNormalize({key:'sqValue'});
+        dataMigrator.removeNormalizer({key:'sqValue'});
         done();
       });
     });
-  });
-  describe('addPaths()', function() {
-    it('should support adding in an array of path objects');
+    it('should return detailed stats on the results of the function');
+    it('should work with appending items from one array into another');
   });
   describe('exportPaths()', function() {
     it('should support exporting a list of paths');
