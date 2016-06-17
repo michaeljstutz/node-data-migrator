@@ -2,7 +2,10 @@
 
 const _ = require('lodash');
 const expect = require('chai').expect
+// Memory tests
 //const memwatch = require('memwatch-next');
+//memwatch.on('leak', function(info) { console.log(info) });
+//memwatch.on('stats', function(stats) { console.log(stats) });
 
 const DataMigrator = require('../lib/data-migrator');
 
@@ -25,7 +28,6 @@ describe('Working with DataMigrator', function(done) {
     it('should be created using the new keyword to create an instance', function(done){
       expect(DataMigrator).to.throw('Object must be created using the new keyword');
       expect(new DataMigrator()).to.be.an('object');
-      let test2 = new DataMigrator();
       done();  
     });
     it('should support passing in starting params', function(){
@@ -49,10 +51,11 @@ describe('Working with DataMigrator', function(done) {
     });
     it('should not throw an error when passing a plain object', function(){
       expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator._source).to.deep.equal(testSource);
     });
     it('should return an object with the same testing value', function(){
       expect(dataMigrator.getSource.bind(dataMigrator)()).that.is.an('object')
-        .to.have.property('testing', testSource.testing);
+        .to.deep.equal(testSource);
     });
   });
   describe('setTarget() & getTarget()', function() {
@@ -61,10 +64,11 @@ describe('Working with DataMigrator', function(done) {
     });
     it('should not throw an error when passing a plain object', function(){
       expect(dataMigrator.setTarget.bind(dataMigrator, testTarget)).to.not.throw('target must be a plain object and not null');
+      expect(dataMigrator._target).to.deep.equal(testTarget);
     });
     it('should return an object with the same testing value', function(){
       expect(dataMigrator.getTarget.bind(dataMigrator)()).that.is.an('object')
-        .to.have.property('testing', testTarget.testing);
+        .to.deep.equal(testTarget);
     });
   });
   describe('reset()', function() {
@@ -83,6 +87,26 @@ describe('Working with DataMigrator', function(done) {
     it('should throw an error when parms.from is empty', function(){
       testParams.from = '';
       expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.throw('params[0].from can not be empty');
+    });
+    it('should support passing params.from as a string', function(){
+      testParams.from = 'sourceObject1.key1';
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
+      testParams.from = 'sourceObject1.key1()';
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
+      testParams.from = 'sourceObject1.key1[]';
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
+    });
+    it('should support passing params.from as an array', function(){
+      testParams.from = ['sourceObject1','key1'];
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
+      testParams.from = ['sourceObject1','key1', '[]'];
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
+      testParams.from = ['sourceObject1','key1', '()'];
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
+    });
+    it('should support passing params.from as a function', function(){
+      testParams.from = () => {return 1;};
+      expect(dataMigrator.addPath.bind(dataMigrator, testParams)).to.not.throw();
     });
     it('should support adding in an array of path objects', function(){
       expect(dataMigrator.addPath.bind(dataMigrator, [
@@ -217,6 +241,7 @@ describe('Working with DataMigrator', function(done) {
       expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
     });
     it('should process all the paths added', function(done){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
       dataMigrator.addPath(
         {
           from:'sourceObject1.key1',
@@ -235,6 +260,7 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should work with custom condition functions', function(done){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
       dataMigrator.addPath(
         {
           from:'sourceObject1.key1',
@@ -254,6 +280,7 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should work with custom normalizer functions', function(done){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
       dataMigrator.addNormalizer({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
       dataMigrator.addPath(
         {
@@ -268,13 +295,50 @@ describe('Working with DataMigrator', function(done) {
         done();
       });
     });
-    it('should return detailed stats on the results of the function');
-    it('should work with appending items from one array into another');
+    it('should return detailed stats on the results of the function', function(done){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      dataMigrator.addNormalizer({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
+      dataMigrator.addPath(
+        {
+          from:'sourceObject1.key4',
+          normalizer: 'sqValue',
+        }
+      );
+      dataMigrator.run({}, (err, stats)=>{
+        expect(stats).to.have.property('sourceUriNotFound', 0);
+        expect(stats).to.have.property('fromConditionFailed', 0);
+        expect(stats).to.have.property('toConditionFailed', 0);
+        expect(stats).to.have.property('totalToPathsProcessed', 1);
+        expect(stats).to.have.property('totalFromPathsProcessed', 1);
+        dataMigrator.clearPaths();
+        dataMigrator.removeNormalizer({key:'sqValue'});
+        done();
+      });
+    });
+    it('should work with appending items from one array into another', function(done){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      let tempTarget = {sourceObject1:{key5:[10,20,30,40,50]}};
+      expect(dataMigrator.setTarget.bind(dataMigrator, tempTarget)).to.not.throw('source must be a plain object and not null');
+      dataMigrator.addPath(
+        {
+          from:'sourceObject1.key5[]',
+          to:'sourceObject1.key5[]',
+        }
+      );
+
+      dataMigrator.run({}, (err, stats)=>{
+        expect(dataMigrator._target.sourceObject1.key5).to.have.lengthOf(10);
+        dataMigrator.clearPaths();
+        done();
+      });
+    });
   });
+  /* Added for later
   describe('exportPaths()', function() {
     it('should support exporting a list of paths');
   });
   describe('importPaths()', function() {
     it('should support adding in an exported list of paths');
   });
+  */
 });

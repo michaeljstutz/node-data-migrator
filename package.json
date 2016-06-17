@@ -4,7 +4,7 @@
   "description": "Node.js module for migrating data between two different data objects using paths, conditions, and normalize functions",
   "main": "lib/data-migrator.js",
   "scripts": {
-    "test": "mocha --reporterspec --bail --check-leaks test/"
+    "test": "mocha --reporterspec --bail --timeout 30000 --check-leaks test/"
   },
   "repository": {
     "type": "git",
