@@ -333,6 +333,48 @@ describe('Working with DataMigrator', function(done) {
       });
     });
   });
+  describe('Create output for the README', function() {
+    it('should console.log some results', function(done){
+      let sourceObject = {
+        item1: 1,
+        item2: '2',
+        item3: [3],
+        item4: 4,
+        item5: 4,
+      };
+
+      let targetObject = {
+        item1: 0,
+        item2: 0,
+        item3: 0,
+        item4: 0,
+        item5: 5,
+      };
+
+      let dataMigrator = new DataMigrator({source:sourceObject, target:targetObject});
+
+      // addPath supports the following keys 
+      dataMigrator.addPath({from:'item1'});
+      dataMigrator.addPath({from:'item2', to:'item2', normalizer: 'number'});
+      dataMigrator.addPath({from:'item3[0]', to:'item3'});
+      dataMigrator.addPath({from:'item4', fromCondition:'isNumber', normalizer: function(value){ return value * 1; }});
+      dataMigrator.addPath({from:'item5', toCondition:'notEqual', toConditionArgs: 5});
+
+      dataMigrator.run(function(err, stats){
+        console.log('dataMigrator.run() has completed with the below stats...');
+        console.log(JSON.stringify(stats, null, 2));
+        console.log(JSON.stringify(targetObject, null, 2));
+        expect(targetObject).to.deep.equal({
+          item1: 1,
+          item2: 2,
+          item3: 3,
+          item4: 4,
+          item5: 5,
+        });
+        done();
+      });
+    });
+  });
   /* Added for later
   describe('exportPaths()', function() {
     it('should support exporting a list of paths');

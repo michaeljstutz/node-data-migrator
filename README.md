@@ -37,7 +37,7 @@ dataMigrator.addPath({from:'item1'});
 dataMigrator.addPath({from:'item2', normalizer: 'number'});
 dataMigrator.addPath({from:'item3[0]', to:'item3'});
 dataMigrator.addPath({from:'item4', fromCondition:'isNumber', normalizer: function(value){ return value * 1; }});
-dataMigrator.addPath({from:'item5', toCondition:'isEmpty'});
+dataMigrator.addPath({from:'item5', toCondition:'notEqual', toConditionArgs: 5});
 
 dataMigrator.run(function(err, stats){
   console.log('dataMigrator.run() has completed with the below stats...');
@@ -47,7 +47,22 @@ dataMigrator.run(function(err, stats){
 ```
 ###The code should display the following on the console
 ```js
-
+dataMigrator.run() has completed with the below stats...
+{
+  "sourceUriNotFound": 0,
+  "fromConditionFailed": 0,
+  "toConditionFailed": 1,
+  "totalToPathsProcessed": 5,
+  "totalNoramlizerCalls": 4,
+  "totalFromPathsProcessed": 5
+}
+{
+  "item1": 1,
+  "item2": 2,
+  "item3": 3,
+  "item4": 4,
+  "item5": 5
+}
 ```
 
 ## Documentation
@@ -107,30 +122,28 @@ The params argument can be a single object or an array of object
 #### Params
 
 This can be a single object or an array of object with the following keys:
-* [from*](#addPath.params.from): (String|Array)
-* [fromArray](#addPath.params.fromArray): (Boolean)
-* [fromCondition](#addPath.params.fromCondition): (String|Function)
-* [fromConditionArgs](#addPath.params.fromConditionArgs): (*)
-* [fromConditionTest](#addPath.params.fromConditionTest): (Boolean)
-* [normalizer](#addPath.params.normalizer): (String|Function)
-* [normalizerArgs](#addPath.params.normalizerArgs): (*)
-* [to](#addPath.params.to): (String|Array)
-* [toArray](#addPath.params.toArray): (Boolean)
-* [toCondition](#addPath.params.toCondition): (String|Function)
-* [toConditionArgs](#addPath.params.toConditionArgs): (*)
-* [toConditionTest](#addPath.params.toConditionTest): (Boolean)
+* [from](#addPath.params.from) - Accepts (String|Array|Function) - This is the path or function for getting the value from the source
+* [fromArray](#addPath.params.fromArray) - Accepts (Boolean)
+* [fromCondition](#addPath.params.fromCondition) - Accepts (String|Function)
+* [fromConditionArgs](#addPath.params.fromConditionArgs) - Accepts (*)
+* [fromConditionTest](#addPath.params.fromConditionTest) - Accepts (Boolean)
+* [normalizer](#addPath.params.normalizer) - Accepts (String|Function)
+* [normalizerArgs](#addPath.params.normalizerArgs) - Accepts (*)
+* [to](#addPath.params.to) - Accepts (String|Array|Function) - This is the path or function for setting the value to the target
+* [toArray](#addPath.params.toArray) - Accepts (Boolean)
+* [toCondition](#addPath.params.toCondition) - Accepts (String|Function)
+* [toConditionArgs](#addPath.params.toConditionArgs) - Accepts (*)
+* [toConditionTest](#addPath.params.toConditionTest) - Accepts (Boolean)
 
-*Note: Required key
+####<a name="addPath.params.from"></a>params.from: (String|Array|Function) _required param_
 
-####<a name="addPath.params.from"></a>params.from: (String|Array) _*required_
-
-This is the main required param, this is the path (or function) to the data you would like to start with.
+This is the main required param, which should be a string or array path to the value in the source or a function that will return a value.
 
 **Example:**
 ```js
-params.from = 'firstKey.secondKey.thirdKey';
+params.from = 'firstKey.secondKey[1].thirdKey';
 // OR
-params.from = ['firstKey', 'secondKey', 'thirdKey'];
+params.from = ['firstKey', 'secondKey', '1', 'thirdKey'];
 // OR
 params.from = function(){
   return 'value';
@@ -141,12 +154,14 @@ If you would like the 'from' to be processed as an array, append [] to the strin
 
 **Example:**
 ```js
-params.from = 'firstKey.secondKey.thirdKey[]';
+params.from = 'firstKey.secondKey[1].thirdKey[]';
 // OR
-params.from = ['firstKey', 'secondKey', 'thirdKey', '[]'];
+params.from = ['firstKey', 'secondKey', '1', 'thirdKey', '[]'];
+// OR
+params.from = ['firstKey', 'secondKey', '1', 'thirdKey[]'];
 ```
 
-####<a name="addPath.params.fromArray"></a>params.fromArray: (boolean)
+####<a name="addPath.params.fromArray"></a>params.fromArray: (Boolean)
 
 This param forces the run function to process the source path value as an array, looping through the values calling against the normalizer function and to function with each iteration.
 
@@ -195,7 +210,7 @@ The fromCondition will return a boolean, this setting allows you to change if th
 params.fromConditionTest = true;
 ```
 
-####<a name="addPath.params.normalizer"></a>params.normalizer
+####<a name="addPath.params.normalizer"></a>params.normalizer: (String|Function)
 
 This param allows for a process the data before it is saved to the target path. This can be a string key referencing an already added function [see addNormalizer()](#addNormalizer) for more information on adding a new normalizer. Please note addPath will error if the normalizer string key is not found.
 
@@ -208,7 +223,7 @@ params.normalizer = function(value){
 };
 ```
 
-####<a name="addPath.params.normalizerArgs"></a>params.normalizerArgs
+####<a name="addPath.params.normalizerArgs"></a>params.normalizerArgs: (*)
 
 This param allows you to send args to the normalizer function
 
@@ -222,7 +237,7 @@ params.normalizer = function(value, args){
 
 ```
 
-####<a name="addPath.params.to"></a>params.to
+####<a name="addPath.params.to"></a>params.to: (String|Array|Function)
 
 This is the path (or function) to the location you would like to save to.
 
@@ -246,7 +261,7 @@ params.to = 'firstKey.secondKey.thirdKey[]';
 params.to = ['firstKey', 'secondKey', 'thirdKey', '[]'];
 ```
 
-####<a name="addPath.params.toArray"></a>params.toArray
+####<a name="addPath.params.toArray"></a>params.toArray: (Boolean)
 
 This param forces the run function to push to the target path as an array. If the value is not set or is not an array it will be created or converted to an array.
 
@@ -257,7 +272,7 @@ This param will bypass the check for '[]' inside the to forcing it to work with 
 params.toArray = true;
 ```
 
-####<a name="addPath.params.toCondition"></a>params.toCondition
+####<a name="addPath.params.toCondition"></a>params.toCondition (String|Function)
 
 This param allows for a pre-check condition to be checked before saving the data to the target. This can be a string key referencing an already added function [see addCondition()](#addCondition) for more information on adding a new condition or [see addCondition -> Available Internal Conditions()](#addCondition.internalConditions) for a list available functions. Please note addPath will error if the condition string key is not found.
 
@@ -270,7 +285,7 @@ params.fromCondition = function(value){
 };
 ```
 
-####<a name="addPath.params.toConditionArgs"></a>params.toConditionArgs
+####<a name="addPath.params.toConditionArgs"></a>params.toConditionArgs: (*)
 
 This param allows you to send args to the condition function
 
@@ -286,7 +301,7 @@ params.toCondition = function(value, args){
 
 ```
 
-####<a name="addPath.params.toConditionTest"></a>params.toConditionTest
+####<a name="addPath.params.toConditionTest"></a>params.toConditionTest (Boolean)
 
 The toCondition will return a boolean, this setting allows you to change if the condition should match true or false.
 
