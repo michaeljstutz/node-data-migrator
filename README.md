@@ -171,7 +171,7 @@ var dataMigrator = new DataMigrator({source: sourceObject, target: targetObject}
 * [`removePath(id)`](#removePath) - Remove a path
 * [`reset([params])`](#reset) - Reset the instance
 * [`run([params], callback)`](#run) - Used to run the migration
-* [`runCondition(key, value, [args])`](#runCondition) - Run a condition
+* [`runCondition(key, value, args, conditionTest)`](#runCondition) - Run a condition
 * [`runNormalizer(key, value, [args])`](#runNormalizer) - Run a normalizer
 * [`setSource(source)`](#setSource) - Set the source object
 * [`setTarget(target)`](#setTarget) - Set the target object
