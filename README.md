@@ -108,12 +108,15 @@ Here is the basics on how to initialize the DataMigrator.
 The data migrator must be initialized using the `new` keyword, to create a new instance of the migrator
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `params` (Object): Params
 
 **Params Object**
+
 - `source`: (Object) - The source object passed to [`setSource`](#setSource)
 - `target`: (String) - The target object passed to [`setTarget`](#setTarget)
 - `condition`: (Object|Array) - The condition object or an array of objects passed to [`addCondition`](#addCondition)
@@ -123,9 +126,11 @@ The data migrator must be initialized using the `new` keyword, to create a new i
 The above params are processed in that order.
 
 **Returns**
+
 (Object): The newly initialized DataMigration object.
 
 **Examples**
+
 ```js
 // Empty dataMigrator
 var dataMigrator = new DataMigrator();
@@ -197,21 +202,26 @@ After the DataMigrator has been created you have access to the following functio
 Adds new condition(s) to the private conditions object. This allows the use of key based string referances in the addPath functions.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `params` (Object|Array): Object or an array of objects
 
 **Params Object**
+
 - `key`: (String) - The key to use for the condition
 - `function`: (Function) - The [`condition`](#condition) function to call
 
 The condition format can be found under [Expected Function Formats](#expected.function.formats) section.
 
 **Returns**
+
 (Integer): The number of conditions added
 
 **Examples**
+
 ```js
 //Adding a Single Condition
 var params = {
@@ -279,21 +289,26 @@ If you do not like the way one of the above functions handles the condition mapp
 Adds new normalizer(s) to the private normalizers object. This allows the use of key based string referances in the addPath functions.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `params` (Object|Array): Object or an array of objects
 
 **Params Object**
+
 - `key`: (String) - The key to use for the normalizer
 - `function`: (Function) - The [`normalizer`](#normalizer) function to call
 
 The normalizer format can be found under [Expected Function Formats](#expected.function.formats) section.
 
 **Returns**
+
 (Integer): The number of normalizers added
 
 **Examples**
+
 ```js
 //Adding a Single Normalizer
 var params = {
@@ -338,9 +353,11 @@ If you do not like the way one of the above functions handles the normalizing yo
 This function is used in adding path mappings to process. The params argument can be a single object or an array of object
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `params` (Object|Array): Object or an array of objects
 
 **Params Object**
@@ -359,6 +376,7 @@ This function is used in adding path mappings to process. The params argument ca
 * [`toConditionTest`](#addPath.params.toConditionTest): (Boolean) - _Optional_
 
 **Examples**
+
 ```js
 // Migrate a single path from source.item1 to target.item1
 var count = dataMigrator.addPath({
@@ -385,6 +403,7 @@ If you would like the 'from' to be processed as an array, append [] to the strin
 The [`from`](#from) function format can be found under the [Expected Function Formats](#expected.function.formats) section.
 
 **Examples**
+
 ```js
 // String Path
 params.from = 'firstKey.secondKey[1].thirdKey';
@@ -419,6 +438,7 @@ This param forces the run function to process the source path value as an array,
 This param will bypass the check for '[]' inside the from forcing it to work with the from as an array.
 
 **Example**
+
 ```js
 params.fromArray = true;
 ```
@@ -428,6 +448,7 @@ params.fromArray = true;
 This param allows for a pre-check condition to be checked before running through the normalizer. This can be a string key referencing an already added function [see addCondition()](#addCondition) for more information on adding a new condition or [see addCondition -> Available Internal Conditions()](#addCondition.internalConditions) for a list available functions. Please note addPath will error if the condition string key is not found.
 
 **Examples**
+
 ```js
 // Use the internal condition 'isTrue'
 params.fromCondition = 'isTrue';
@@ -444,6 +465,7 @@ params.fromCondition = function(value){
 This param allows you to send args to the condition function
 
 **Examples**
+
 ```js
 // Using the internal condition `eq` to check against the args
 params.fromConditionArgs = 'testing';
@@ -462,6 +484,7 @@ params.fromCondition = function(value, args){
 The fromCondition will return a boolean, this setting allows you to change if the condition should match true or false.
 
 **Example**
+
 ```js
 params.fromConditionTest = true;
 ```
@@ -473,6 +496,7 @@ This param allows for a process the data before it is saved to the target path. 
 The [`normalizer`](#normalizer) function format can be found under the [Expected Function Formats](#expected.function.formats) section.
 
 **Examples**
+
 ```js
 // Using the internal normalizer 'string'
 params.normalizer = 'string';
@@ -489,6 +513,7 @@ params.normalizer = function(value){
 This param allows you to send args to the normalizer function
 
 **Example**
+
 ```js
 params.normalizerArgs = 1;
 params.normalizer = function(value, args){ 
@@ -508,6 +533,7 @@ The [`to`](#to) function format can be found under the [Expected Function Format
 If you would like to append the data to an array, append [] to the string or as the last item in the array. If this is not set it will overwrite the data rather then append it. If you are assigning a functions please see the [params.toArray](#addPath.params.toArray) documentation for getting around not having access to adding '[]'.
 
 **Examples**
+
 ```js
 // Use a string key to set the to
 params.to = 'firstKey.secondKey.thirdKey';
@@ -538,6 +564,7 @@ This param forces the run function to push to the target path as an array. If th
 This param will bypass the check for '[]' inside the to forcing it to work with the to as an array.
 
 **Example**
+
 ```js
 params.toArray = true;
 ```
@@ -547,6 +574,7 @@ params.toArray = true;
 This param allows for a pre-check condition to be checked before saving the data to the target. This can be a string key referencing an already added function [see addCondition()](#addCondition) for more information on adding a new condition or [see addCondition -> Available Internal Conditions()](#addCondition.internalConditions) for a list available functions. Please note addPath will error if the condition string key is not found.
 
 **Examples**
+
 ```js
 // Use the internal condition 'isEmpty'
 params.fromCondition = 'isEmpty';
@@ -563,6 +591,7 @@ params.fromCondition = function(value){
 This param allows you to send args to the condition function
 
 **Examples**
+
 ```js
 // Using the internal condition `eq` to check against the args
 params.toConditionArgs = 'testing';
@@ -581,6 +610,7 @@ params.toCondition = function(value, args){
 The toCondition will return a boolean, this setting allows you to change if the condition should match true or false.
 
 **Example**
+
 ```js
 params.toConditionTest = true;
 ```
@@ -592,15 +622,19 @@ params.toConditionTest = true;
 This will return the source object.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 - None
 
 **Returns**
+
 (object): The source object
 
 **Example**
+
 ```js
 var source = dataMigrator.getSource();
 ```
@@ -612,15 +646,19 @@ var source = dataMigrator.getSource();
 This will return the target object.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 - None
 
 **Returns**
+
 (object): The target object
 
 **Example**
+
 ```js
 var target = dataMigrator.getTarget();
 ```
@@ -634,15 +672,19 @@ Return a random sh1 hash based of the current date/time, math.random, and a loda
 The purpose of this function is to create unique ids for the functions added to the Data Migrator.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 - None
 
 **Returns**
+
 (string): The generated hash
 
 **Example**
+
 ```js
 var randomHash = dataMigrator.randomHash();
 ```
@@ -654,15 +696,19 @@ var randomHash = dataMigrator.randomHash();
 This will remove a condition based on the key passed in. The key can be an array of keys.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `id` (String|Array): The key to be removed or array of keys to be removed.
 
 **Returns**
+
 (integer): Total number of conditions removed
 
 **Examples**
+
 ```js
 var count = dataMigrator.removeCondition('myCondition');
 ```
@@ -680,15 +726,19 @@ var count = dataMigrator.removeCondition([
 This will remove a normalizer based on the key passed in. The key can be an array of keys.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `id` (String|Array): The key to be removed or array of keys to be removed.
 
 **Returns**
+
 (integer): Total number of normalizers removed
 
 **Examples**
+
 ```js
 var count = dataMigrator.removeNormalizer('myNormalizer');
 ```
@@ -706,15 +756,19 @@ var count = dataMigrator.removeNormalizer([
 This will remove a path based on the id. The id can be an array of ids.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `id` (String|Array): The string id to be removed or array of string ids to be removed.
 
 **Returns**
+
 (integer): Total number of paths removed
 
 **Examples**
+
 ```js
 var count = dataMigrator.removePath('89e495e7941cf9e40e6980d14a16bf023ccd4c91');
 ```
@@ -734,12 +788,15 @@ This function allows you to reset diffrent sections of the instance or all secti
 Please note: if you reset the conditions or normalizers and your paths link to that key it will revert back to using the default behaver which is to pass the value through for normalizer and fail for conditions.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `params` (Object): _Optional_ params
 
 **Params Object**
+
 - `conditions`: (Boolean) - Reset the conditions
 - `normalizers`: (Boolean) - Reset the normalizers
 - `paths`: (Boolean) - Reset the paths
@@ -747,9 +804,11 @@ Please note: if you reset the conditions or normalizers and your paths link to t
 - `target`: (Boolean) - Reset the target to an empty object
 
 **Returns**
+
 (null): Nothing is returned
 
 **Examples**
+
 ```js
 // Reset just the paths
 data.Migrator.reset({paths: true});
@@ -766,19 +825,24 @@ dataMigrator.reset();
 Run the migration. This will go through the added paths migrating the data.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `params` (Object): _Optional_ params.
 2. `callback` (*): Callback function
 
 **Params Object**
+
 See the [initialize params](#DataMigrator) for details.
 
 **Returns**
+
 (null): Nothing is returned
 
 **Examples**
+
 ```js
 // Using both params and callback
 dataMigrator.run({}, function(err){
@@ -799,18 +863,22 @@ dataMigrator.run(function(err){
 This function runs the condition return a boolean.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `key` (String): The key used to find the function to run
 2. `value` (*): The value to check the condition against
 3. `args` (*): Availble args (if none pass null)
 4. `conditionTest` (Boolean): Condition test to use
 
 **Returns**
+
 (Boolean): The results of the condition check
 
 **Example**
+
 ```js
 var results = runCondition('isEmpty', {}, null, true); // returns true
 ```
@@ -822,17 +890,21 @@ var results = runCondition('isEmpty', {}, null, true); // returns true
 This function runs the normalizer and returns a value
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `key` (String): The key used to find the function to run
 2. `value` (*): The value to check the condition against
 3. `args` (*): _Optional_ args
 
 **Returns**
+
 (*): The results of the normalizer
 
 **Example**
+
 ```js
 var results = runNormalizer('isEmpty', {}); // returns true
 ```
@@ -844,15 +916,19 @@ var results = runNormalizer('isEmpty', {}); // returns true
 Set the source object
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `source` (object): The source objcet
 
 **Returns**
+
 (null): Nothing is returned
 
 **Example**
+
 ```js
 var sourceObject = {};
 dataMigrator.setSource(sourceObject);
@@ -865,15 +941,19 @@ dataMigrator.setSource(sourceObject);
 Set the target object.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `target` (object): The target objcet
 
 **Returns**
+
 (null): Nothing is returned
 
 **Example**
+
 ```js
 var targetObject = {};
 dataMigrator.setTarget(targetObject);
@@ -894,15 +974,19 @@ Please note that if you use the new arrow functions this feature will not work d
 Get an item from the source object.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `key` - (String|Array) - The key used to find the value
 
 **Returns**
+
 (*): The value retrieved from the source
 
 **Examples**
+
 ```js
 // Get an item using a string key
 var item1 = this.get('something1.something2.something3.item1');
@@ -919,16 +1003,20 @@ var item2 = this.get(['something1', 'something2', 'something3', 'item1']);
 Sets the value at path of the target.
 
 **Since**
+
 0.1.0
 
 **Arguments**
+
 1. `key` (String|Array): The key used to find the value
 2. `value` (String|Array): The value to set
 
 **Returns**
+
 (object): Returns object.
 
 **Examples**
+
 ```js
 // Set an item using an string key
 this.set('something1.something2.something3.item1', 'newValue');
@@ -961,13 +1049,16 @@ Here are the expected function formats
 ###<a name="condition"></a>condition(value, [args])
 
 **Arguments**
+
 1. `value` (*): The item that needs to be normalized
 2. `args` (*): _Optional_ args
 
 **Returns**
+
 (Boolean|Error): The results of the condition test
 
 **Example**
+
 ```js
 var condition = function(value, args){
   return value !== args;
@@ -979,12 +1070,15 @@ var condition = function(value, args){
 ###<a name="from"></a>from([args])
 
 **Arguments**
+
 1. `args` (*): _Optional_ args
 
 **Returns**
+
 (Boolean|Error): Return true is sucessful or Error object if failure.
 
 **Example**
+
 ```js
 var from = function(args){
   // Get the data from someplace and then return it here
@@ -996,13 +1090,16 @@ var from = function(args){
 ###<a name="normalizer"></a>normalizer(value, [args])
 
 **Arguments**
+
 1. `value` (*): The item that needs to be normalized
 2. `args` (*): _Optional_ args
 
 **Returns**
+
 (*|Error): The normalized value
 
 **Example**
+
 ```js
 var normalizer = function(value, args){
   return value * args;
@@ -1013,13 +1110,16 @@ var normalizer = function(value, args){
 ###<a name="to"></a>to(value, [args])
 
 **Arguments**
+
 1. `value` (*): The value to set on the target
 1. `args` (*): _Optional_ args
 
 **Returns**
+
 (Boolean|Error): Return true is sucessful or Error object if failure.
 
 **Example**
+
 ```js
 var condition = function(value, args){
   // Save the value someplace then return true
