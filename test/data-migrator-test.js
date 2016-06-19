@@ -238,9 +238,9 @@ describe('Working with DataMigrator', function(done) {
       expect(Object.keys(dataMigrator._conditions).length).to.be.a('number', 1);
       expect(Object.keys(dataMigrator._normalizers).length).to.be.a('number', 1);
       expect(Object.keys(dataMigrator._paths).length).to.be.a('number', 1);
-      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
     });
     it('should process all the paths added', function(done){
+      expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
       expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
       dataMigrator.addPath(
         {
