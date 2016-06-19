@@ -66,7 +66,6 @@ dataMigrator.run(function(err, stats){
 ```js
 dataMigrator.run() has completed with the below stats...
 {
-{
   "sourceUriNotFound": 0,
   "fromFailed": 0,
   "fromConditionFailed": 0,
