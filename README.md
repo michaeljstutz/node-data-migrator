@@ -87,18 +87,18 @@ dataMigrator.run() has completed with the below stats...
 
 ## Documentation
 
-This project utilizes mutiple open source projects
+This project utilizes multiple open source projects
 
 * [lodash](https://lodash.com/) - JavaScript utility library
 * [async](https://github.com/caolan/async) - Async utility module
 
-Llicensing and copyrights notices can be found on their respective websites.
+Licensing and copyrights notices can be found on their respective websites.
 
 ---
 
 ### Initialization
 
-Here is the basics on how to initialize the DataMigrator.
+Here are the basics on how to initialize the DataMigrator.
 
 ---
 
@@ -198,7 +198,7 @@ After the DataMigrator has been created you have access to the following functio
 
 ###<a name="addCondition"></a> addCondition(params)
 
-Adds new condition(s) to the private conditions object. This allows the use of key based string referances in the addPath functions.
+Adds new condition(s) to the private conditions object. This allows the use of key based string references in the addPath functions.
 
 **Since**
 
@@ -249,7 +249,7 @@ dataMigrator.addCondition(params);
 
 <a name="addCondition.internalConditions"></a>**List of available internal conditions**
 
-Most of the internal condition are using the lodash library, for more information please visit their documentation page [link](https://lodash.com/docs). Items starting with `not` are mostly just reverses of the `is` versions, example being `notNull` is just `return ! isNull(value)`.
+Most of the internal condition are using the lodash library, for more information please visit their documentation page [link](https://lodash.com/docs). Items starting with `not` are mostly just reverses of the `is` versions, an example being `notNull` is just returning the following `! isNull(value)`.
 
 * true
 * isTrue
@@ -285,7 +285,7 @@ If you do not like the way one of the above functions handles the condition mapp
 
 ###<a name="addNormalizer"></a>addNormalizer(params)
 
-Adds new normalizer(s) to the private normalizers object. This allows the use of key based string referances in the addPath functions.
+Adds new normalizer(s) to the private normalizers object. This allows the use of key based string references in the addPath functions.
 
 **Since**
 
@@ -397,7 +397,7 @@ var count = dataMigrator.addPath({
 
 This is the main required param, which should be a string or array path to the value in the source or a function that will return a value.
 
-If you would like the 'from' to be processed as an array, append [] to the string or as the last item in the array. If you are assigning a functions please see the [params.fromArray](#addPath.params.fromArray) documentation for getting around not having access to adding '[]'.
+If you would like the 'from' to be processed as an array, append [] to the string or as the last item in the array. If you are assigning a function please see the [params.fromArray](#addPath.params.fromArray) documentation for getting around not having access to adding '[]'.
 
 The [`from`](#from) function format can be found under the [Expected Function Formats](#expected.function.formats) section.
 
@@ -525,11 +525,11 @@ params.normalizer = function(value, args){
 
 This is the path (or function) to the location you would like to save to.
 
-By default it will use the `from` path (String|Array) but will not work if (Function)
+By default, it will use the `from` path (String|Array) but will not work if (Function)
 
 The [`to`](#to) function format can be found under the [Expected Function Formats](#expected.function.formats) section.
 
-If you would like to append the data to an array, append [] to the string or as the last item in the array. If this is not set it will overwrite the data rather then append it. If you are assigning a functions please see the [params.toArray](#addPath.params.toArray) documentation for getting around not having access to adding '[]'.
+If you would like to append the data to an array, append [] to the string or as the last item in the array. If this is not set it will overwrite the data rather then append it. If you are assigning a function please see the [params.toArray](#addPath.params.toArray) documentation for getting around not having access to adding '[]'.
 
 **Examples**
 
@@ -666,7 +666,7 @@ var target = dataMigrator.getTarget();
 
 ###<a name="randomHash"></a> randomHash()
 
-Return a random sh1 hash based of the current date/time, math.random, and a lodash.uniqueId.
+Return a random sh1 hash based off the current date/time, math.random, and a lodash.uniqueId.
 
 The purpose of this function is to create unique ids for the functions added to the Data Migrator.
 
@@ -782,9 +782,9 @@ var count = dataMigrator.removePath([
 
 ###<a name="reset"></a> reset(params)
 
-This function allows you to reset diffrent sections of the instance or all sections by calling reset without params.
+This function allows you to reset different sections of the instance or all sections by calling reset without params.
 
-Please note: if you reset the conditions or normalizers and your paths link to that key it will revert back to using the default behaver which is to pass the value through for normalizer and fail for conditions.
+Please note: if you reset the conditions or normalizers and your paths link to that key it will revert back to using the default functionality where the value is just passed through for a normalizer and fail for conditions.
 
 **Since**
 
@@ -869,7 +869,7 @@ This function runs the condition return a boolean.
 
 1. `key` (String): The key used to find the function to run
 2. `value` (*): The value to check the condition against
-3. `args` (*): Availble args (if none pass null)
+3. `args` (*): Available args (if none pass null)
 4. `conditionTest` (Boolean): Condition test to use
 
 **Returns**
@@ -920,7 +920,7 @@ Set the source object
 
 **Arguments**
 
-1. `source` (object): The source objcet
+1. `source` (object): The source object
 
 **Returns**
 
@@ -945,7 +945,7 @@ Set the target object.
 
 **Arguments**
 
-1. `target` (object): The target objcet
+1. `target` (object): The target obect
 
 **Returns**
 
@@ -999,7 +999,7 @@ var item2 = this.get(['something1', 'something2', 'something3', 'item1']);
 
 ###<a name="safescope.set"></a> set(key, value)
 
-Sets the value at path of the target.
+Sets the value at the path of the target.
 
 **Since**
 
@@ -1074,7 +1074,7 @@ var condition = function(value, args){
 
 **Returns**
 
-(Boolean|Error): Return true is sucessful or Error object if failure.
+(Boolean|Error): Return true is successful or Error object if failure.
 
 **Example**
 
@@ -1110,12 +1110,12 @@ var normalizer = function(value, args){
 
 **Arguments**
 
-1. `value` (*): The value to set on the target
+1. `value` (*): The value to set the target to
 1. `args` (*): _Optional_ args
 
 **Returns**
 
-(Boolean|Error): Return true is sucessful or Error object if failure.
+(Boolean|Error): Return true is successful or Error object if failure.
 
 **Example**
 
