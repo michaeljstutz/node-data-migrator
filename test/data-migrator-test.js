@@ -337,6 +337,23 @@ describe('Working with DataMigrator', function(done) {
         done();
       });
     });
+    it('should work with appending items from one array into another', function(done){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
+      let tempTarget = {sourceObject1:{key5:[10,20,30,40,50]}};
+      expect(dataMigrator.setTarget.bind(dataMigrator, tempTarget)).to.not.throw('source must be a object and not null');
+      dataMigrator.addPath(
+        {
+          from:'sourceObject1.key5[]',
+          to:'sourceObject1.key5[]',
+        }
+      );
+
+      dataMigrator.run({}, (err, stats)=>{
+        expect(dataMigrator._target.sourceObject1.key5).to.have.lengthOf(10);
+        dataMigrator.clearPaths();
+        done();
+      });
+    });
     it('should work with passing an object of options', function(done){
       let sourceObject = {
         item1: 1,
