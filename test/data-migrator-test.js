@@ -22,7 +22,12 @@ describe('Working with DataMigrator', function(done) {
       key6: {one:1, two:'2', three: 3, four: 4, five: '5'},
     },
   };
-  let testTarget = {testing:true,sourceObject1:{key1: false }};
+  let testTarget = {
+    testing:true,
+    sourceObject1:{
+      key1: false 
+    }
+  };
   let dataMigrator = new DataMigrator();
   describe('Base functionality', function() {
     it('should be created using the new keyword to create an instance', function(done){
@@ -47,10 +52,10 @@ describe('Working with DataMigrator', function(done) {
   });
   describe('setSource() & getSource()', function() {
     it('should throw an error when passed a bad object', function(){
-      expect(dataMigrator.setSource.bind(dataMigrator, 1)).to.throw('source must be a plain object and not null');
+      expect(dataMigrator.setSource.bind(dataMigrator, 1)).to.throw('source must be a object and not null');
     });
-    it('should not throw an error when passing a plain object', function(){
-      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+    it('should not throw an error when passing a object', function(){
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
       expect(dataMigrator._source).to.deep.equal(testSource);
     });
     it('should return an object with the same testing value', function(){
@@ -60,10 +65,10 @@ describe('Working with DataMigrator', function(done) {
   });
   describe('setTarget() & getTarget()', function() {
     it('should throw an error when passed a bad object', function(){
-      expect(dataMigrator.setTarget.bind(dataMigrator, 1)).to.throw('target must be a plain object and not null');
+      expect(dataMigrator.setTarget.bind(dataMigrator, 1)).to.throw('target must be a object and not null');
     });
-    it('should not throw an error when passing a plain object', function(){
-      expect(dataMigrator.setTarget.bind(dataMigrator, testTarget)).to.not.throw('target must be a plain object and not null');
+    it('should not throw an error when passing a object', function(){
+      expect(dataMigrator.setTarget.bind(dataMigrator, testTarget)).to.not.throw('target must be a object and not null');
       expect(dataMigrator._target).to.deep.equal(testTarget);
     });
     it('should return an object with the same testing value', function(){
@@ -241,7 +246,7 @@ describe('Working with DataMigrator', function(done) {
     });
     it('should process all the paths added', function(done){
       expect(dataMigrator.reset.bind(dataMigrator)).to.not.throw();
-      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
       dataMigrator.addPath(
         {
           from:'sourceObject1.key1',
@@ -260,7 +265,7 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should work with custom condition functions', function(done){
-      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
       dataMigrator.addPath(
         {
           from:'sourceObject1.key1',
@@ -280,7 +285,7 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should work with custom normalizer functions', function(done){
-      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
       dataMigrator.addNormalizer({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
       dataMigrator.addPath(
         {
@@ -296,7 +301,7 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should return detailed stats on the results of the function', function(done){
-      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
       dataMigrator.addNormalizer({key:'sqValue', function: function(value) { return _.toNumber(value) * _.toNumber(value); } });
       dataMigrator.addPath(
         {
@@ -316,9 +321,9 @@ describe('Working with DataMigrator', function(done) {
       });
     });
     it('should work with appending items from one array into another', function(done){
-      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator.setSource.bind(dataMigrator, testSource)).to.not.throw('source must be a object and not null');
       let tempTarget = {sourceObject1:{key5:[10,20,30,40,50]}};
-      expect(dataMigrator.setTarget.bind(dataMigrator, tempTarget)).to.not.throw('source must be a plain object and not null');
+      expect(dataMigrator.setTarget.bind(dataMigrator, tempTarget)).to.not.throw('source must be a object and not null');
       dataMigrator.addPath(
         {
           from:'sourceObject1.key5[]',
@@ -329,6 +334,43 @@ describe('Working with DataMigrator', function(done) {
       dataMigrator.run({}, (err, stats)=>{
         expect(dataMigrator._target.sourceObject1.key5).to.have.lengthOf(10);
         dataMigrator.clearPaths();
+        done();
+      });
+    });
+    it('should work with passing an object of options', function(done){
+      let sourceObject = {
+        item1: 1,
+        item2: '2',
+        item3: [3],
+        item4: 4,
+        item5: 4,
+      };
+
+      let targetObject = {
+        item1: 0,
+        item2: 0,
+        item3: 0,
+        item4: 0,
+        item5: 5,
+      };
+
+      let dataMigrator = new DataMigrator();
+
+      // addPath supports the following keys 
+      dataMigrator.addPath({from:'item1'});
+      dataMigrator.addPath({from:'item2', to:'item2', normalizer: 'number'});
+      dataMigrator.addPath({from:'item3[0]', to:'item3'});
+      dataMigrator.addPath({from:'item4', fromCondition:'isNumber', normalizer: function(value){ return value * 1; }});
+      dataMigrator.addPath({from:'item5', toCondition:'notEqual', toConditionArgs: 5});
+
+      dataMigrator.run({source:sourceObject, target:targetObject}, function(err, stats){
+        expect(targetObject).to.deep.equal({
+          item1: 1,
+          item2: 2,
+          item3: 3,
+          item4: 4,
+          item5: 5,
+        });
         done();
       });
     });
