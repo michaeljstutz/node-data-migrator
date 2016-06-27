@@ -198,7 +198,7 @@ After the DataMigrator has been created you have access to the following functio
 
 ###<a name="addCondition"></a> addCondition(params)
 
-Adds new condition(s) to the private conditions object. This allows the use of key based string references in the addPath functions.
+Adds one or more conditions to the private object. This allows the use of key based string references in the addPath functions.
 
 **Since**
 
@@ -249,7 +249,7 @@ dataMigrator.addCondition(params);
 
 <a name="addCondition.internalConditions"></a>**List of available internal conditions**
 
-Most of the internal condition are using the lodash library, for more information please visit their documentation page [link](https://lodash.com/docs). Items starting with `not` are mostly just reverses of the `is` versions, an example being `notNull` is just returning the following `! isNull(value)`.
+Most of the internal condition are using the lodash library, for more information please visit their documentation page [link](https://lodash.com/docs). Items starting with `not` are mostly just reverse variations of the `is` versions, an example being `notNull` is just returning the following `! isNull(value)`.
 
 * true
 * isTrue
@@ -281,11 +281,11 @@ Most of the internal condition are using the lodash library, for more informatio
 * isEqual
 * notEqual
 
-If you do not like the way one of the above functions handles the condition mapping you can simply add a new condition using the same name as above.
+You can override the above internal functions by adding your own using [`addCondition`](#addCondition) and passing the same key value.
 
 ###<a name="addNormalizer"></a>addNormalizer(params)
 
-Adds new normalizer(s) to the private normalizers object. This allows the use of key based string references in the addPath functions.
+Adds one or more normalizers to the private object. This allows the use of key based string references in the addPath functions.
 
 **Since**
 
@@ -349,7 +349,7 @@ If you do not like the way one of the above functions handles the normalizing yo
 
 ### addPath(params)
 
-This function is used in adding path mappings to process. The params argument can be a single object or an array of object
+This function is used in adding path mappings to process. The params argument can be a single object or an array of objects
 
 **Since**
 
